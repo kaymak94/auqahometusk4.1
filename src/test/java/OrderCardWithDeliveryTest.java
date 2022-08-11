@@ -5,11 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.*;
 
 public class OrderCardWithDeliveryTest {
+
+    public String generateDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
 
     @BeforeEach
     void setup() {
@@ -17,17 +23,18 @@ public class OrderCardWithDeliveryTest {
     }
 
     @Test
-    void ShouldReturnSuccessMsg() {
+    void shouldReturnSuccessMsg() {
+        String planningDate = generateDate(4);
         Configuration.holdBrowserOpen = true;
         $("[data-test-id='city'] input").val("Ростов-на-Дону");
         $x("//input[@placeholder='Дата встречи']").val(Keys.chord(Keys.SHIFT, Keys.HOME, Keys.BACK_SPACE));
-        $x("//input[@placeholder='Дата встречи']").val("08.08.2022");
+        $x("//input[@placeholder='Дата встречи']").val(generateDate(4));
         $x("//input[@name='name']").val("Кожин Павел");
         $x("//input[@name='phone']").val("+79612847267");
         $("[data-test-id='agreement']").click();
         $x("//span[@class='button__text']").click();
         $x("//*[contains(text(),'Успешно!')]").shouldBe(visible, Duration.ofSeconds(15));
-        $("[class='notification__content']").shouldHave(Condition.text("Встреча успешно забронирована на " + " 08.08.2022")).shouldBe(visible, Duration.ofSeconds(15));
+        $("[class='notification__content']").shouldHave(Condition.text("Встреча успешно забронирована на " + generateDate(4))).shouldBe(visible, Duration.ofSeconds(15));
 
 
     }
